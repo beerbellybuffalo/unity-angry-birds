@@ -8,11 +8,13 @@ public class ObjectScript : MonoBehaviour
 	
 	private GameObject player;
 	private int hits = 0;
+	private AudioSource audioSource;
 		
     // Start is called before the first frame update
     void Start()
     {
 		player = GameObject.FindGameObjectWithTag("Player");
+		audioSource = gameObject.GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -26,6 +28,10 @@ public class ObjectScript : MonoBehaviour
 	void OnCollisionEnter(Collision collision) {
 		if (collision.gameObject.tag == "Bird") {
 			hits++;
+			AudioSource.PlayClipAtPoint(audioSource.clip, transform.position, 0.3f);
+			
+			//changes colour based on number of hits it has taken
+			gameObject.GetComponent<Renderer>().material.color = new Color((float)hits/(float)hitsToDestroy,0,0);
 
 			if (hits >= hitsToDestroy) {
 				player.GetComponent<LauncherScript>().ChangePoints(hitsToDestroy);

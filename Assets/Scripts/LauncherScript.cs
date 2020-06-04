@@ -22,6 +22,7 @@ public class LauncherScript : MonoBehaviour
 	private Text pointsTrackerText;
 	private Text birdsTrackerText;
 	private Text fireTrackerText;
+	private Animator firepowerTrackerAnimator;
 	
 	
     // Start is called before the first frame update
@@ -33,6 +34,9 @@ public class LauncherScript : MonoBehaviour
 		birdsTrackerText = GameObject.FindGameObjectWithTag("BirdsTracker").GetComponent<Text>();
 		birdsTrackerText.text = "Birds Remaining: " + maxBirdsToCreate.ToString() + "/" + maxBirdsToCreate.ToString();
 		fireTrackerText = GameObject.FindGameObjectWithTag("FireTracker").GetComponent<Text>();
+		
+		firepowerTrackerAnimator = GameObject.FindGameObjectWithTag("FirepowerBar").GetComponent<Animator>();
+		firepowerTrackerAnimator.speed = (1/maxTimeToHoldFire);
     }
 
     // Update is called once per frame
@@ -46,6 +50,9 @@ public class LauncherScript : MonoBehaviour
 			fireTrackerText.text = "Reloading...";
 			return;
 		}
+		else if (isFiring) {
+			fireTrackerText.text = "";
+		}
 		else {
 			fireTrackerText.text = "Ready to Fire!!!";
 		}
@@ -55,6 +62,9 @@ public class LauncherScript : MonoBehaviour
 			//get vector of mouse position
 			initialTime = Time.time;
 			isFiring = true; //this bool is here because when you spam click the mouse button, you can GetMouseButtonUp to trigger but not GetMouseButtonDown sometimes
+			
+			//play animation
+			firepowerTrackerAnimator.SetBool("isFiring", true);
 		}
 		
 		//when mouse button is released, create and fire a bird
@@ -66,6 +76,8 @@ public class LauncherScript : MonoBehaviour
 			
 			//adjust the ui
 			birdsTrackerText.text = "Birds Remaining: " + (maxBirdsToCreate - birdsCreated).ToString() + "/" + maxBirdsToCreate.ToString();
+			firepowerTrackerAnimator.SetBool("isFiring", false);
+			firepowerTrackerAnimator.Play("Empty");
 			
 			//adjusting the position of the bird
 			birdGameObject.transform.position -= transform.forward * 1f;
