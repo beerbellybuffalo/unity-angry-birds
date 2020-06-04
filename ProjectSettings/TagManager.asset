@@ -4,8 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Block
   - Bird
+  - Wood Block
+  - Steel Block
+  - PointsTracker
+  - BirdsTracker
+  - FireTracker
   layers:
   - Default
   - TransparentFX

@@ -1,25 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class LauncherScript : MonoBehaviour
 {
 	public GameObject birdPrefab;	
 	public float firingSensitivity;
+	public float fireInterval;
 	public float maxTimeToHoldFire;
 	public int maxBirdsToCreate;
 	
 	private float initialTime;
+	private float fireTiming;
 	private int birdsCreated = 0;
 	private bool isFiring = false;
 	private bool endGame = false;
-
+	
+	private int points = 0;
+	private Text pointsTrackerText;
+	private Text birdsTrackerText;
+	private Text fireTrackerText;
+	
 	
     // Start is called before the first frame update
     void Start()
     {
-       
+		fireTiming = -fireInterval;//set this so that canfire will return true at start of game
+		pointsTrackerText = GameObject.FindGameObjectWithTag("PointsTracker").GetComponent<Text>();
+		pointsTrackerText.text = "Points: " + points.ToString();
+		birdsTrackerText = GameObject.FindGameObjectWithTag("BirdsTracker").GetComponent<Text>();
+		birdsTrackerText.text = "Birds Remaining: " + maxBirdsToCreate.ToString() + "/" + maxBirdsToCreate.ToString();
+		fireTrackerText = GameObject.FindGameObjectWithTag("FireTracker").GetComponent<Text>();
     }
 
     // Update is called once per frame
@@ -27,6 +40,14 @@ public class LauncherScript : MonoBehaviour
     {
 		if (endGame) {
 			return;
+		}
+		
+		if (!CanFire()) {
+			fireTrackerText.text = "Reloading...";
+			return;
+		}
+		else {
+			fireTrackerText.text = "Ready to Fire!!!";
 		}
 		
 		//checking for mouseclick down to fire a bird
@@ -42,6 +63,9 @@ public class LauncherScript : MonoBehaviour
 			//spawn the bird
 			birdsCreated++;
 			GameObject birdGameObject = Instantiate(birdPrefab, transform.position, transform.rotation);
+			
+			//adjust the ui
+			birdsTrackerText.text = "Birds Remaining: " + (maxBirdsToCreate - birdsCreated).ToString() + "/" + maxBirdsToCreate.ToString();
 			
 			//adjusting the position of the bird
 			birdGameObject.transform.position -= transform.forward * 1f;
@@ -62,15 +86,33 @@ public class LauncherScript : MonoBehaviour
 						
 			//if the player runs out of birds, end the game
 			if (birdsCreated == maxBirdsToCreate) {
-				endGame = true;
+				EndGame();
 			}
 			
+			//moved checking for no blocks left into object script
+			
+			//sets the time that you fired the bird - there's an interval before you can shoot again
+			fireTiming = Time.time;
 			isFiring = false;
 		}
-		
-		//if there are no more blocks left, end the game
-		if (GameObject.FindGameObjectsWithTag("Block").Length == 0) {
-			endGame = true;
-		}
     }
+	
+	bool CanFire() {
+		if (((Time.time - fireTiming) > fireInterval)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public void ChangePoints(int change) {
+		points += change;
+		pointsTrackerText.text = "Points: " + points.ToString();
+	}
+	
+	public void EndGame() {
+		endGame = true;
+		SceneManager.LoadScene("EndGameScene");
+	}
 }

@@ -4,22 +4,43 @@ using UnityEngine;
 
 public class ObjectScript : MonoBehaviour
 {
+	public int hitsToDestroy;
+	
+	private GameObject player;
+	private int hits = 0;
 		
     // Start is called before the first frame update
     void Start()
     {
-		
+		player = GameObject.FindGameObjectWithTag("Player");
     }
 
     // Update is called once per frame
     void Update()
     {
-		
+		if (transform.position.y<-10) {//so object is destroyed after falling off the platform
+			Destroy(gameObject);
+		}
     }
 	
 	void OnCollisionEnter(Collision collision) {
 		if (collision.gameObject.tag == "Bird") {
-			Destroy(gameObject);
+			hits++;
+
+			if (hits >= hitsToDestroy) {
+				player.GetComponent<LauncherScript>().ChangePoints(hitsToDestroy);
+				
+				//if there are no more blocks left, end the game
+				if (CheckNumberBlocks() == 1) {
+					player.GetComponent<LauncherScript>().EndGame();
+				}
+				
+				Destroy(gameObject);
+			}			
 		}
+	}
+	
+	int CheckNumberBlocks() {
+		return (GameObject.FindGameObjectsWithTag("Wood Block").Length + GameObject.FindGameObjectsWithTag("Steel Block").Length);
 	}
 }
