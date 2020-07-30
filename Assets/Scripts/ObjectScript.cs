@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//when do we need to run this script? on Start/ on Update/ on something else?
 public class ObjectScript : MonoBehaviour
 {
 		
@@ -17,6 +18,7 @@ public class ObjectScript : MonoBehaviour
 		
     }
 	
+	//Create a function to destroy the Block when it is hit by a Bird
 	void OnCollisionEnter(Collision collision) {
 		if (collision.gameObject.tag == "Bird") {
 			Destroy(gameObject);
